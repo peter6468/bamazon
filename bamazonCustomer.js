@@ -19,6 +19,7 @@ connection.connect(function (err) {
 
 var makeTable = function () {
     connection.query("SELECT * FROM products", function (err, res) {
+        if(err) throw err;
         for (var i = 0; i < res.length; i++) {
             console.log(res[i].item_id + " || " + res[i].product_name + " || "
                 + res[i].department_name + " || " + res[i].price + " || " + res[i].stock_quantity + "\n");
@@ -38,11 +39,16 @@ var promptCustomer = function (res) {
         process.exit();
        }
         for (var i = 0; i < res.length; i++) {
+            console.log(answer);
+            console.log(res[i]);
             if (res[i].product_name === answer.choice) {
                 correct = true;
                 var product = answer.choice;
                 var id = i;
-                var totalCost = answer.quantity * res[i].price
+                console.log(answer.quantity); 
+                console.log(res[i].price);
+                var totalCost = res[i].stock_quantity * res[i].price
+                console.log('U suck!!');
                 console.log(totalCost);
                 inquirer.prompt({
                     type: "input",
