@@ -12,73 +12,123 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("Connected as id: " + connection.threadId);
-    makeTable();
+    start();
     console.log('             Welcome to Bamazon                 ')
     console.log('------------------------------------------------')
 })
 
-var makeTable = function () {
+var start = function () {
     connection.query("SELECT * FROM products", function (err, res) {
-        if(err) throw err;
+        if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            console.log(res[i].item_id + " || " + res[i].product_name + " || "
-                + res[i].department_name + " || " + res[i].price + " || " + res[i].stock_quantity + "\n");
+            console.log("ID: " + res[i].item_id + " || " + "Product: " + res[i].product_name + " || "
+                + "Department: " + res[i].department_name + " || " + "Price: " + res[i].price + " || " + res[i].stock_quantity + "\n");
         }
         promptCustomer(res);
     })
 }
 
 var promptCustomer = function (res) {
+    //console.log(res);
     inquirer.prompt([{
         type: "input",
-        name: "choice",
-        message: "What would you like to purchase? [Press Q to Quit]"
-    }]).then(function (answer) {
-        var correct = false;
-        if(answer.choice.toUpperCase() === "Q") {
-        process.exit();
-       }
-        for (var i = 0; i < res.length; i++) {
-            console.log(answer);
-            console.log(res[i]);
-            if (res[i].product_name === answer.choice) {
-                correct = true;
-                var product = answer.choice;
-                var id = i;
-                console.log(answer.quantity); 
-                console.log(res[i].price);
-                var totalCost = res[i].stock_quantity * res[i].price
-                console.log('U suck!!');
-                console.log(totalCost);
-                inquirer.prompt({
-                    type: "input",
-                    name: "quantity",
-                    message: "How many would you like to purchase?",
-                    validate: function (value) {
-                        if (isNaN(value) === false) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }).then(function (answer) {
-                    if ((res[id].stock_quantity - answer.quantity) > 0) {
-                        connection.query("UPDATE products  SET  stock_quantity ='" + (res[id].stock_quantity -
-                            answer.quantity) + "' WHERE product_name = '" + product
-                            + "'", function (err, res2) {
-                                console.log("Product Purchased.  Your total is: + answer.quantity *");
-                                makeTable();
-                            })
-                    } else {
-                        console.log("Not a valid choice");
-                        promptCustomer(res);
-                    }
-                })
+        name: "id",
+        message: "What is the ID of the product you would like to purchase?",
+        validate: function (value) {
+            if (isNaN(value) === false && parseInt(value) <= res.length && parseInt(value) > 0) {
+                return true;
+            } else {
+                return false;
             }
         }
-    if(i === res.length && correct === false) {
-        console.log("Sorry This Item Is Currently Not Available");
-        promptCustomer(res);
+    },
+    {
+        type: "input",
+        name: "quantity",
+        message: "How many would you like to purchase?",
+        validate: function (value) {
+            if (isNaN(value) === false) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
+    ]).then(function (answer) {
+        var whatToBuy = (answer.id) - 1;
+        console.log(answer.id);
+        console.log(whatToBuy);
+        var howManyToBuy = parseInt(answer.quantity);
+        console.log(howManyToBuy);
+        console.log('u suck');
+        var grandTotal = parseFloat(((res[whatToBuy].price) * howManyToBuy).toFixed(2));
+        console.log(grandTotal);
+        //console.log(res[whatToBuy].Price);
+
+        //checking if there is enough quantity
+        if (res[whatToBuy].stock_quantity >= howManyToBuy) {
+            //updates quantity after purchase in db
+            connection.query("UPDATE products SET ? WHERE ?",
+                [
+                    { 
+                        stock_quantity: (res[whatToBuy].stock_quantity - howManyToBuy) 
+                    },
+                    { 
+                        item_id: answer.id
+                     }
+                ], function (err, result) {
+                    if (err) throw err;
+                    console.log("Congratulations!  Your total is $" + grandTotal.toFixed(2) + ".  Your item(s) will be shipped shortly");
+                });
+            //Department vs department_name
+            connection.query("SELECT * FROM Departments", function (err, deptRes) {
+                if (err) throw err;
+                var index;
+                for (var i = 0; i < deptRes.length; i++) {
+                    if (deptRes[i].department_name === res[whatToBuy].department_name) {
+                        index = i;
+                    }
+                }
+
+                //updates totalSales in departments table
+                //Department vs department_name
+                connection.query("UPDATE Department SET ? WHERE ?",
+                    [
+                        { 
+                            TotalSales: deptRes[index].TotalSales + grandTotal 
+                        },
+                        { 
+                            department_name: res[whatToBuy.department_name] 
+                        }
+                    ], function (err, deptRes) {
+                        if (err) throw err;
+                    });
+            });
+        } else {
+            console.log("Sorry This Item Is Currently Not Available");
+        }
+
+        reprompt();
+
     })
 }
+
+
+
+//asks if they would like to purchase another item
+var reprompt = function () {
+    inquirer.prompt([{
+        type: "confirm",
+        name: "reply",
+        message: "Would you like to purchase another item?"
+    }]).then(function (ans) {
+        if (ans.reply) {
+            start();
+        } else {
+            console.log("See you soon!");
+        }
+    });
+}
+
+//start();
+
