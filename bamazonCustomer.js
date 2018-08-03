@@ -29,7 +29,7 @@ var start = function () {
 }
 
 var promptCustomer = function (res) {
-    console.log(res);
+    //console.log(res);
     inquirer.prompt([{
         type: "input",
         name: "id",
@@ -56,16 +56,9 @@ var promptCustomer = function (res) {
     }
     ]).then(function (answer) {
         var whatToBuy = (answer.id) - 1;
-        console.log(answer.id);
-        console.log(whatToBuy);
         var howManyToBuy = parseInt(answer.quantity);
-        console.log(howManyToBuy);
-        console.log('u suck');
         var grandTotal = parseFloat(((res[whatToBuy].price) * howManyToBuy).toFixed(2));
-        console.log(grandTotal);
-        console.log(res[whatToBuy].Price);
 
-        //checking if there is enough quantity
         if (res[whatToBuy].stock_quantity >= howManyToBuy) {
             //updates quantity after purchase in db
             connection.query("UPDATE products SET ? WHERE ?",
@@ -109,26 +102,24 @@ var promptCustomer = function (res) {
             console.log("Sorry This Item Is Currently Not Available");
         }
 
-        reprompt();
+         reprompt();
 
     })
 }
 
 
 
-//asks if they would like to purchase another item
+// asks if they would like to purchase another item
 var reprompt = function () {
     inquirer.prompt([{
-        type: "confirm",
-        name: "reply",
-        message: "Would you like to purchase another item?"
-    }]).then(function (ans) {
-        if (ans.reply) {
+        type: "",
+        name: "Confirmed",
+        message: ":"
+    }]).then(function (answer) {
+        if (answer.reply) {
             start();
         } else {
             console.log("See you soon!");
         }
     });
 }
-
-
