@@ -53,7 +53,9 @@ var getFromProducts = function() {
 var makeTable = function () {
     connection.query("SELECT * FROM products", function (err, res) {
         for (var i = 0; i < res.length; i++) {
-            itemArray.push(res[i.product_name])
+            itemArray.push(res[i].product_name);
+            console.log('u suck');
+            console.log(res[i].product_name);
             console.log(res[i].item_id + " || " + res[i].product_name + " || "
                 + res[i].department_name + " || " + res[i].price + " || " + res[i].stock_quantity + "\n");
         }

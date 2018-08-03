@@ -29,7 +29,7 @@ var start = function () {
 }
 
 var promptCustomer = function (res) {
-    //console.log(res);
+    console.log(res);
     inquirer.prompt([{
         type: "input",
         name: "id",
@@ -63,7 +63,7 @@ var promptCustomer = function (res) {
         console.log('u suck');
         var grandTotal = parseFloat(((res[whatToBuy].price) * howManyToBuy).toFixed(2));
         console.log(grandTotal);
-        //console.log(res[whatToBuy].Price);
+        console.log(res[whatToBuy].Price);
 
         //checking if there is enough quantity
         if (res[whatToBuy].stock_quantity >= howManyToBuy) {
@@ -72,6 +72,7 @@ var promptCustomer = function (res) {
                 [
                     { 
                         stock_quantity: (res[whatToBuy].stock_quantity - howManyToBuy) 
+                        //console.log((res[whatToBuy].stock_quantity)
                     },
                     { 
                         item_id: answer.id
@@ -130,5 +131,4 @@ var reprompt = function () {
     });
 }
 
-//start();
 
