@@ -6,7 +6,7 @@ Bamazon is an Amazon-like store front using a CLI(command line interface).  All 
 How to Get Started
 1.clone repo
 2.run 'npm install'
-3.run 'node.BamazonCustomer.js'
+3.run 'node.bamazonCustomer.js'
 
 What The Different Javascript files do:
 1.bamazonCustomer.js
