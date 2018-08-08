@@ -7,6 +7,9 @@ How to Get Started
 1.clone repo
 2.run 'npm install'
 3.run 'node.bamazonCustomer.js'
+4.need MAMP and mySQL workbench
+5.use schema.sql to populate db in mySQL 
+6.use bamazon.sql to update mySQL inventory
 
 What The Different Javascript files do:
 1.bamazonCustomer.js
